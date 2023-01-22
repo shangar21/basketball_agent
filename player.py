@@ -1,15 +1,36 @@
 from enum import Enum
-import numpy
+import numpy as np
+from functools import total_ordering
+
+'''
+field goal percentage dict:
+{
+    '<5': 0.1, # less than 5 feet
+    '5-9': 0.2, # 5 - 9 feet
+    '10-14': 0.3,
+    '15-19': 0.4,
+    '20-24': 0.5,
+    '25-29':0.6
+}
+'''
 
 class Attempt(Enum):
     SUCCESS = 1
     FAIL = 0
     FOUL = -1
 
+class DistanceBucket(Enum):
+    RESTRICTED_AREA = 0
+    IN_THE_PAINT = 1
+    MIDRANGE = 2
+    LEFT_CORNER_THREE = 3
+    RIGHT_CORNER_THREE = 4
+    ABOVE_THE_BREAK_THREE = 5
+
 class Player():
-    def __init__(self, fgp, tpp, ftp, orebp, drebp, astp, tovp, stlp, blkp, pfp):
+    def __init__(self, name, fgp, ftp, orebp, drebp, astp, tovp, stlp, blkp, pfp):
+        self.name = name
         self.fgp = fgp
-        self.tpp = tpp
         self.ftp = ftp
         self.orebp = orebp
         self.drebp = drebp
@@ -24,11 +45,8 @@ class Player():
             return Attempt.SUCCESS
         return Attempt.FAIL
 
-    def field_goal(self):
-        return self._attempt(self.fgp)
-
-    def three_point(self):
-        return self._attempt(self.tpp)
+    def field_goal(self, distance_bucket):
+        return self._attempt(self.fgp[distance_bucket])
 
     def free_throw(self):
         return self._attempt(self.ftp)
@@ -37,7 +55,7 @@ class Player():
         return self._attempt(self.astp)
 
     def _attempt_defence(self, stat):
-        if self._attempt(self.pfp):
+        if self._attempt(self.pfp) is Attempt.SUCCESS:
             return Attempt.FOUL
         return self._attempt(stat)
 
