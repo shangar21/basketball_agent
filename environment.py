@@ -54,23 +54,25 @@ class Basketball():
         print(f'Player {self.attack_player.name} shoots ball from {distance}')
         shot_made = self.attack_player.field_goal(distance)
         shot_blocked = self.defend_player.block()
+
         if shot_blocked is Attempt.SUCCESS:
             print(f'Player {self.defend_player.name} blocks shot.')
             self.reward = -2
         elif shot_blocked is Attempt.FOUL:
+            print(f'Player {self.attack_player.name} was fouled.')
             if shot_made is Attempt.SUCCESS:
-                print(f'Player {self.attack_player.name} was fouled, and made shot. And 1 granted.')
-                self.reward += 2 if distance.value <= DistanceBucket.MIDRANGE.value else 3
+                print(f'Shot made, and 1 granted.')
+                self.reward = 2 if distance.value <= DistanceBucket.MIDRANGE.value else 3
                 self._shoot_ft(num_shots=1)
             else:
-                print(f'Player {self.attack_player.name} was fouled. Shooting free throw.')
                 self._shoot_ft()
-        elif shot_made is Attempt.SUCCESS and distance.value >= DistanceBucket.LEFT_CORNER_THREE.value:
-            print(f'Player {self.attack_player.name} makes three point shot.')
-            self.reward = 3
-        elif shot_made is Attempt.SUCCESS and distance.value <= DistanceBucket.MIDRANGE.value:
-            print(f'Player {self.attack_player.name} makes two point shot.')
-            self.reward = 2
+        elif shot_made is Attempt.SUCCESS:
+            if distance.value >= DistanceBucket.LEFT_CORNER_THREE.value:
+                print(f'Player {self.attack_player.name} makes three point shot.')
+                self.reward = 3
+            elif distance.value <= DistanceBucket.MIDRANGE.value:
+                print(f'Player {self.attack_player.name} makes two point shot.')
+                self.reward = 2
         elif shot_made is Attempt.FAIL:
             print(f'Player {self.attack_player.name} misses shot.')
             self.reward = -2
