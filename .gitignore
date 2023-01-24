@@ -50,3 +50,9 @@ coverage.xml
 docs/_build/
 
 **/[Tt]est.py
+
+*.xml
+
+.idea/
+
+**/shelf/
