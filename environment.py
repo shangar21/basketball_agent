@@ -38,14 +38,14 @@ class Basketball():
         self.is_in_play = True
         self.reward = 0
 
-    def _shoot_ft(self, num_shots = 2):
+    def _shoot_ft(self, num_shots = 2, and_one = False):
         pts = 0
         for i in range(num_shots):
             if self.attack_player.free_throw() == Attempt.SUCCESS:
                 pts += 1
                 print(f'Freethrow made.')
             else:
-                pts -= 1
+                pts -= 1 if not and_one else 0
                 print(f'Missed freethrow.')
         self.reward += pts
 
@@ -63,7 +63,7 @@ class Basketball():
             if shot_made is Attempt.SUCCESS:
                 print(f'Shot made, and 1 granted.')
                 self.reward = 2 if distance.value <= DistanceBucket.MIDRANGE.value else 3
-                self._shoot_ft(num_shots=1)
+                self._shoot_ft(num_shots=1, and_one=True)
             else:
                 self._shoot_ft()
         elif shot_made is Attempt.SUCCESS:
