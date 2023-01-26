@@ -28,7 +28,7 @@ class DistanceBucket(Enum):
     ABOVE_THE_BREAK_THREE = 5
 
 class Player():
-    def __init__(self, name, fgp, ftp, orebp, drebp, astp, tovp, stlp, blkp, pfp):
+    def __init__(self, name, fgp, ftp, orebp, drebp, astp, tovp, stlp, blkp, pfp, distance):
         self.name = name
         self.fgp = fgp
         self.ftp = ftp
@@ -39,20 +39,27 @@ class Player():
         self.stlp = stlp
         self.blkp = blkp
         self.pfp = pfp
+        self.distance = distance
 
     def _attempt(self, stat):
         if np.random.uniform() < stat:
             return Attempt.SUCCESS
         return Attempt.FAIL
 
-    def field_goal(self, distance_bucket):
-        return self._attempt(self.fgp[distance_bucket])
+    def field_goal(self):
+        return self._attempt(self.fgp[self.distance])
 
     def free_throw(self):
         return self._attempt(self.ftp)
 
     def assist(self):
         return self._attempt(self.astp)
+
+    def offensive_rebound(self):
+        return self._attempt(self.orebp)
+
+    def defensive_rebound(self):
+        return self._attempt(self.drebp)
 
     def _attempt_defence(self, stat):
         if self._attempt(self.pfp) is Attempt.SUCCESS:
