@@ -113,15 +113,15 @@ class Basketball():
             print(f'Player {self.attack_players[self.attack_player].name} was fouled.')
             if shot_made is Attempt.SUCCESS:
                 print(f'Shot made, and 1 granted.')
-                self.reward = 2 if distance.value <= DistanceBucket.MIDRANGE.value else 3
+                self.reward = 2 if self.attack_players[self.attack_player].distance.value <= DistanceBucket.MIDRANGE.value else 3
                 self._shoot_ft(num_shots=1, and_one=True)
             else:
                 self._shoot_ft()
         elif shot_made is Attempt.SUCCESS:
-            if distance.value >= DistanceBucket.LEFT_CORNER_THREE.value:
+            if self.attack_players[self.attack_player].distance.value >= DistanceBucket.LEFT_CORNER_THREE.value:
                 print(f'Player {self.attack_players[self.attack_player].name} makes three point shot.')
                 self.reward = 3
-            elif distance.value <= DistanceBucket.MIDRANGE.value:
+            elif self.attack_players[self.attack_player].distance.value <= DistanceBucket.MIDRANGE.value:
                 print(f'Player {self.attack_players[self.attack_player].name} makes two point shot.')
                 self.reward = 2
         elif shot_made is Attempt.FAIL:
