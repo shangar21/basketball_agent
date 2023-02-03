@@ -24,8 +24,8 @@ class DistanceBucket(Enum):
     IN_THE_PAINT = 1
     MIDRANGE = 2
     LEFT_CORNER_THREE = 3
-    RIGHT_CORNER_THREE = 4
-    ABOVE_THE_BREAK_THREE = 5
+    RIGHT_CORNER_THREE = 3
+    ABOVE_THE_BREAK_THREE = 4
 
 class Player():
     def __init__(self, name, fgp, ftp, orebp, drebp, astp, tovp, stlp, blkp, pfp, distance):

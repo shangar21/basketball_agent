@@ -34,9 +34,10 @@ attack_players = {
 '''
 
 class Action(Enum):
-    SHOOT = 1
-    DRIBBLE = 0
-    PASS = 1
+    SHOOT = 2
+    DRIBBLE_FORWARD = -1
+    DRIBBLE_BACK = 1
+    PASS = 3
 
 class Basketball():
     def __generate_state(self):
@@ -114,9 +115,26 @@ class Basketball():
             else:
                 print(f'Shot Missed, player {self.attack_players[player_in_paint].name} went for rebound, but did not get it!')
 
+    def _dribble(self, direction):
+        new_dist = DistanceBucket(self.attack_players[self.attack_player].distance.value + direction)
+        print(f'Player {self.attack_players[self.attack_player].name} is dribbling to {new_dist} from {self.attack_players[self.attack_player].distance}')
+        defensive_steal = self.defend_players[self.attack_player].steal()
+        if defensive_steal is Attempt.FOUL:
+            print(f'Player {self.defend_players[self.attack_player].name} fouls, freethrow rewarded')
+            self._shoot_ft()
+        elif defensive_steal is Attempt.SUCCESS:
+            print(f'Player {self.defend_players[self.attack_player].name} steals ball!')
+            self.reward -= 2
+        else:
+            print(f'Player {self.attack_players[self.attack_player].name} makes it to {new_dist}')
+            self.reward += 1
+        return defensive_steal, new_dist
+
+
     def step(self, action):
+        self.reward = 0
         print(f'Player {self.attack_players[self.attack_player].name} has ball.')
-        if action == Action.SHOOT:
+        if action is Action.SHOOT:
             shot_made, shot_blocked = self._shoot_fg()
             if shot_made is Attempt.FAIL and shot_blocked is Attempt.FAIL:
                 current_possession = self._rebound()
@@ -128,5 +146,23 @@ class Basketball():
             else:
                 self.is_in_play = False
             return self.reward
-
-
+        elif action is Action.DRIBBLE_FORWARD:
+            if self.attack_players[self.attack_player].distance.value > 0:
+                defensive_steal, new_dist = self._dribble(action.value)
+                if defensive_steal is Attempt.FAIL:
+                    self.attack_players[self.attack_player].distance = new_dist
+                    self.__generate_state()
+                else:
+                    self.is_in_play = False
+            else:
+                    self.step(Action.DRIBBLE_BACK)
+        elif action is Action.DRIBBLE_BACK:
+            if self.attack_players[self.attack_player].distance.value < 4:
+                defensive_steal, new_dist = self._dribble(action.value)
+                if defensive_steal is Attempt.FAIL:
+                    self.attack_players[self.attack_player].distance = new_dist
+                    self.__generate_state()
+                else:
+                    self.is_in_play = False
+            else:
+                    self.step(Action.DRIBBLE_FORWARD)
