@@ -1,5 +1,5 @@
 import numpy as np
-from player import Player, DistanceBucket, Attempt
+from player import SimplePlayer, DistanceBucket, Attempt
 from enum import Enum
 
 '''
@@ -39,7 +39,7 @@ class Action(Enum):
     DRIBBLE_BACK = 1
     PASS = 3
 
-class Basketball():
+class SimpleBasketball():
     def __generate_state(self):
         attack_keys = ['ftp', 'orebp', 'astp', 'tovp']
         defend_keys = ['stlp', 'blkp', 'pfp', 'drebp']
