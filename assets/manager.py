@@ -1,5 +1,5 @@
 import numpy as np
-from assets import Attempt
+from .assets import Attempt
 
 class Manager():
     def __init__(self, attack_player, defend_player, coefficients):
