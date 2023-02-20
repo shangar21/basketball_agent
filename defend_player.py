@@ -1,5 +1,5 @@
 from assets import player
-from pandas import pd
+import pandas as pd
 
 class DefendPlayer(player.Player):
     def get_steal(self):
