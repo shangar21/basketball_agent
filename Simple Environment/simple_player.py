@@ -27,7 +27,7 @@ class DistanceBucket(Enum):
     RIGHT_CORNER_THREE = 3
     ABOVE_THE_BREAK_THREE = 4
 
-class Player():
+class SimplePlayer():
     def __init__(self, name, fgp, ftp, orebp, drebp, astp, tovp, stlp, blkp, pfp, distance):
         self.name = name
         self.fgp = fgp
