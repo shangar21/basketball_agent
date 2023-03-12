@@ -2,9 +2,8 @@ from assets import manager
 
 class ShotManager(manager.Manager):
     def field_goal(self, shot_clock_bucket):
-        distance_bucket = self.attack_player.position
         shot_probability = self.adjust_stat(
-            self.attack_player.get_fgp(distance_bucket),
+            self.attack_player.get_fgp(self.attack_player.position),
             'shotclock',
             shot_clock_bucket
         )

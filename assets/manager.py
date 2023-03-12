@@ -8,7 +8,9 @@ class Manager():
         self.coefficients = coefficients
 
     def get_coefficient(self, coefficient):
-        return self.coefficients[coefficient]
+        if coefficient in self.coefficients
+            return self.coefficients[coefficient]
+        return 0
 
     def adjust_stat(self, stat, coefficient, state, offensive=True):
         player = self.attack_player if offensive else self.defend_player

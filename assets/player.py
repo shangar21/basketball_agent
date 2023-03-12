@@ -6,6 +6,7 @@ class Player():
         self.position = start_position
 
     def __init__(self, dataframe, player_name, start_position):
+        self.name = player_name
         self.data = dataframe[[dataframe['name'] == player_name]]
         self.position = start_position
 
