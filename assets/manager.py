@@ -2,13 +2,14 @@ import numpy as np
 from .assets import Attempt
 
 class Manager():
-    def __init__(self, attack_player, defend_player, coefficients):
+    def __init__(self, attack_player, defend_player, coefficients, court):
         self.attack_player = attack_player
         self.defend_player = defend_player
         self.coefficients = coefficients
+        self.court = court
 
     def get_coefficient(self, coefficient):
-        if coefficient in self.coefficients
+        if coefficient in self.coefficients:
             return self.coefficients[coefficient]
         return 0
 
