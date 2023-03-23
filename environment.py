@@ -1,6 +1,7 @@
 from attack_player import AttackPlayer
 from defend_player import DefendPlayer
 from shooting_manager import ShotManager
+from dribbling_manager import DribbleManager
 from pass_manager import PassManager
 from assets import court, assets
 import pandas as pd
@@ -18,12 +19,15 @@ class BasketballEnvironment():
         self.defend_players = []
         self.shooting_managers = {}
         self.passing_managers = {}
+        self.dribble_managers = {}
 
     def start(self):
+        self.time = 24
         self.initialize_offensive_players()
         self.initialize_defensive_players()
         self.initialize_shooting_manager()
         self.initialize_passing_manager()
+        self.initialize_dribble_manager()
         self.player_with_ball = self._find_player(self.attack_players, 'PG')
 
     def _find_player(self, players_list, position):
@@ -67,6 +71,11 @@ class BasketballEnvironment():
            defender = self._find_player(self.defend_players, i.data['position'].iloc[0])
            self.passing_managers[i] = PassManager(i, defender, [], self.court)
 
+    def initialize_dribble_manager(self):
+        for i in self.attack_players:
+           defender = self._find_player(self.defend_players, i.data['position'].iloc[0])
+           self.dribble_managers[i] = DribbleManager(i, defender, [], self.court)
+
     def _shoot(self, player):
        manager = self.shooting_managers[player]
        return manager.field_goal()
@@ -83,12 +92,23 @@ class BasketballEnvironment():
             self.player_with_ball = player_to
         return reward
 
+    def _dribble(self, action):
+        direction = action.__str__().split('_')[-1]
+        manager = self.dribble_managers[self.player_with_ball]
+        time_to_dribble, reward = manager.dribble(direction)
+        self.time -= time_to_dribble
+        return reward
+
     def step(self, action):
         print(f"{self.player_with_ball.data['name'].iloc[0]} has ball!")
         if action is assets.Action.SHOOT:
+            self.time -= 1
             return self._shoot(self.player_with_ball)
         if action.value >= 5:
+            self.time -= 1
             return self._pass(action)
+        if 1 <= action.value <= 4:
+            return self._dribble(action)
 
 if __name__ == "__main__":
     env = BasketballEnvironment('./assets/datasets/')
@@ -98,5 +118,6 @@ if __name__ == "__main__":
     point_to_region = court.point_to_region(ap.position, env.court)
     reward = env._shoot(env.attack_players[0])
     print(reward)
-    reward = env._pass(assets.Action.PASS_TO_SF)
+#    reward = env._pass(assets.Action.PASS_TO_SF)
+    reward = env._dribble(assets.Action.DRIBBLE_FORWARD)
 
