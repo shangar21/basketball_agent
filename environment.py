@@ -80,13 +80,16 @@ class BasketballEnvironment():
         manager = self.shooting_managers[player]
         reward = manager.field_goal()
         if reward < 0:
-            manager = self.rebound_managers[
-                    self._find_player_closeset_to(
+            closest_to_paint =  self._find_player_closeset_to(
                         self.attack_players,
                         self.court[self.court['name'] == 'in_the_paint'].geometry
                     )
-                ]
-            reward += manager.rebound()
+
+            manager = self.rebound_managers[closest_to_paint]
+            rebound_reward = manager.rebound()
+            if rebound_reward > 0:
+                self.player_with_ball = closest_to_paint
+            reward += rebound_reward
         return reward
 
 
@@ -127,7 +130,6 @@ if __name__ == "__main__":
     ap = env.attack_players[0]
     point_to_region = court.point_to_region(ap.position, env.court)
     reward = env._shoot(env.attack_players[0])
-    print(reward)
 #    reward = env._pass(assets.Action.PASS_TO_SF)
     reward = env._dribble(assets.Action.DRIBBLE_FORWARD)
 
