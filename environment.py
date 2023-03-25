@@ -1,9 +1,9 @@
-from attack_player import AttackPlayer
-from defend_player import DefendPlayer
-from shooting_manager import ShotManager
-from dribbling_manager import DribbleManager
-from rebound_manager import ReboundManager
-from pass_manager import PassManager
+from assets.attack_player import AttackPlayer
+from assets.shooting_manager import ShotManager
+from assets.defend_player import DefendPlayer
+from assets.dribbling_manager import DribbleManager
+from assets.rebound_manager import ReboundManager
+from assets.pass_manager import PassManager
 from assets import court, assets
 import pandas as pd
 import numpy as np
