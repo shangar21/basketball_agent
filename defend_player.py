@@ -9,7 +9,7 @@ class DefendPlayer(player.Player):
         return self.get_stat('blkp')
 
     def get_dreb(self):
-        return self.get_stat('dreb')
+        return self.get_stat('drebp')
 
     def get_foul_percentage(self):
         return self.get_stat('foulp')
