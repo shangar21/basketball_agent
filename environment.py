@@ -2,6 +2,7 @@ from attack_player import AttackPlayer
 from defend_player import DefendPlayer
 from shooting_manager import ShotManager
 from dribbling_manager import DribbleManager
+from rebound_manager import ReboundManager
 from pass_manager import PassManager
 from assets import court, assets
 import pandas as pd
@@ -20,20 +21,26 @@ class BasketballEnvironment():
         self.shooting_managers = {}
         self.passing_managers = {}
         self.dribble_managers = {}
+        self.rebound_managers = {}
 
     def start(self):
         self.time = 24
         self.initialize_offensive_players()
         self.initialize_defensive_players()
-        self.initialize_shooting_manager()
-        self.initialize_passing_manager()
-        self.initialize_dribble_manager()
+        self.initialize_managers()
         self.player_with_ball = self._find_player(self.attack_players, 'PG')
 
     def _find_player(self, players_list, position):
         for i in players_list:
             if i.data['position'].iloc[0] == position:
                 return i
+
+    def _find_player_closeset_to(self, players_list, position):
+        distances = []
+        for i in players_list:
+            point = Point(i.position[0], i.position[1])
+            distances.append(position.distance(point))
+        return players_list[np.argmax(distances)]
 
     def random_point_in_shp(self, shp):
         within = False
@@ -61,24 +68,27 @@ class BasketballEnvironment():
     def initialize_defensive_players(self):
         self.initialize_players('DefendPlayer.csv', self.defend_players, DefendPlayer)
 
-    def initialize_shooting_manager(self):
-        for i in self.attack_players:
-           defender = self._find_player(self.defend_players, i.data['position'].iloc[0])
-           self.shooting_managers[i] = ShotManager(i, defender, [], self.court)
-
-    def initialize_passing_manager(self):
-        for i in self.attack_players:
-           defender = self._find_player(self.defend_players, i.data['position'].iloc[0])
-           self.passing_managers[i] = PassManager(i, defender, [], self.court)
-
-    def initialize_dribble_manager(self):
-        for i in self.attack_players:
-           defender = self._find_player(self.defend_players, i.data['position'].iloc[0])
-           self.dribble_managers[i] = DribbleManager(i, defender, [], self.court)
+    def initialize_managers(self):
+        managers = [ShotManager, DribbleManager, PassManager, ReboundManager]
+        manager_list = [self.shooting_managers, self.dribble_managers, self.passing_managers, self.rebound_managers]
+        for manager in range(len(managers)):
+            for i in self.attack_players:
+                defender = self._find_player(self.defend_players, i.data['position'].iloc[0])
+                manager_list[manager][i] = managers[manager](i, defender, [], self.court)
 
     def _shoot(self, player):
-       manager = self.shooting_managers[player]
-       return manager.field_goal()
+        manager = self.shooting_managers[player]
+        reward = manager.field_goal()
+        if reward < 0:
+            manager = self.rebound_managers[
+                    self._find_player_closeset_to(
+                        self.attack_players,
+                        self.court[self.court['name'] == 'in_the_paint'].geometry
+                    )
+                ]
+            reward += manager.rebound()
+        return reward
+
 
     def _pass(self, action):
         position_to = action.__str__().split('_')[-1]
