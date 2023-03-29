@@ -11,6 +11,7 @@ import shapely
 import geopandas as gpd
 from shapely.geometry import Point
 import random
+import matplotlib.pyplot as plt
 
 class BasketballEnvironment():
 
@@ -40,11 +41,11 @@ class BasketballEnvironment():
         }
 
     def start(self):
-        self.time = 24
+        self.time = np.random.randint(1, 24)
         self.initialize_offensive_players()
         self.initialize_defensive_players()
         self.initialize_managers()
-        self.player_with_ball = random.sample(self.attack_players, 1)[0]#self._find_player(self.attack_players, 'PG')
+        self.player_with_ball = np.random.choice(self.attack_players)#self._find_player(self.attack_players, 'PG')
         self.is_in_play = True
         state = self.get_state()
         return self.get_state()
@@ -117,6 +118,8 @@ class BasketballEnvironment():
             return
         df = read_func(self.path + csv_name).dropna(how='any')
         for i in df['name']:
+            #self.player_region[df[df['name'] == i]['position'].iloc[0]].geometry.plot()
+            #plt.show()
             players_list.append(
                 PlayerClass(
                     df,

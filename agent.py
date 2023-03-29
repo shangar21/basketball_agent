@@ -10,6 +10,9 @@ import torch.nn.functional as F
 import numpy as np
 import matplotlib.pyplot as plt
 from itertools import count
+from tqdm import tqdm
+import os
+import sys
 
 Transitions = namedtuple("Transitions", ('state', 'action', 'next_state', 'reward'))
 
@@ -39,6 +42,15 @@ class DQN(nn.Module):
         x = F.relu(self.layer2(x))
         x = F.relu(self.layer3(x))
         return self.layer4(x)
+
+class HiddenPrints:
+    def __enter__(self):
+        self._original_stdout = sys.stdout
+        sys.stdout = open(os.devnull, 'w')
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        sys.stdout.close()
+        sys.stdout = self._original_stdout
 
 BATCH_SIZE = 256
 GAMMA = 0.99
@@ -108,18 +120,23 @@ episode_rewards = []
 
 epochs = 100
 
-for i in range(epochs):
+for i in tqdm(range(epochs)):
     EPS = 0.9
-    for i_episode in range(num_episodes):
+    for i_episode in tqdm(range(num_episodes)):
         eps = EPS - (0.1*(float(i_episode)/375))
-        print(f'------------------------------------------------------ Starting new episode With Exploration {eps} ------------------------------------------------------')
         state = env.start()
         state = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
         avg_r = []
         episode_going = env.is_in_play
         while episode_going:
             action = select_action(state, eps)
-            observed_reward = env.step(Action(int(action[0][0])))
+            if i_episode < num_episodes - 20:
+                with HiddenPrints():
+                    observed_reward = env.step(Action(int(action[0][0])))
+            else:
+                print(episode_going)
+                print(f'------------------------------------------------------ Starting new episode With Exploration {eps} ------------------------------------------------------')
+                observed_reward = env.step(Action(int(action[0][0])))
             reward = torch.tensor([observed_reward])
             avg_r.append(observed_reward)
             observation = env.get_state()
@@ -141,7 +158,7 @@ for i in range(epochs):
 
 import json
 
-json.dump(episode_rewards, open('episode_rewards.json', 'r+'))
+json.dump(episode_rewards, open('episode_rewards.json', 'w+'))
 
 plt.plot(range(len(episode_rewards)), episode_rewards)
 plt.show()
