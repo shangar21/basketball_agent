@@ -3,7 +3,7 @@ from assets import player, assets
 
 class AttackPlayer(player.Player):
     def get_fgp(self, distance_bucket):
-        return self.get_stat('fgp_' + assets.distance_bucket_to_string(distance_bucket).lower())
+        return self.get_stat('fgp_' + assets.distance_bucket_to_string(distance_bucket).lower()) + 0.3
 
     def get_tpp(self):
         return self.get_stat('tpp')

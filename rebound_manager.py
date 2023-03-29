@@ -14,7 +14,7 @@ class ReboundManager(manager.Manager):
             return 0
         elif off_rebound is assets.Attempt.SUCCESS:
             print(f'{self.attack_player.data["name"].iloc[0]} get rebound!')
-            return 1.5
+            return 0.5
         print('No rebounds won!')
         return 0
 

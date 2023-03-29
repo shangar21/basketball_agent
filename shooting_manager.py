@@ -15,7 +15,7 @@ class ShotManager(manager.Manager):
         print(f"{self.attack_player.data['name'].iloc[0]} takes shot from {distance_bucket}.")
         if block is assets.Attempt.SUCCESS:
             print(f"{self.defend_player.data['name'].iloc[0]} blocks shot.")
-            return -1.5
+            return -0.5
         elif block is assets.Attempt.FOUL:
             print(f"{self.defend_player.data['name'].iloc[0]} fouls!")
             return self.foul_manager(shot, distance_bucket)
@@ -26,7 +26,7 @@ class ShotManager(manager.Manager):
             return 2
         else:
             print(f"{self.attack_player.data['name'].iloc[0]} missed shot!")
-            return -1.5
+            return -0.5
 
     def free_throw(self, nft):
         reward = 0
@@ -37,6 +37,7 @@ class ShotManager(manager.Manager):
                 reward += 1
             else:
                 print(f"Free throw missed!")
+        print(f"Free throws done!")
         return reward
 
     def foul_manager(self, shot, distance_bucket):
@@ -47,5 +48,5 @@ class ShotManager(manager.Manager):
             print(f"{self.attack_player.data['name'].iloc[0]} makes shot! And 1 Awarded")
             nft = 1
         print(f"{self.attack_player.data['name'].iloc[0]} attempts free throws!")
-        return self.free_throw(nft)
+        return reward + self.free_throw(nft)
 
