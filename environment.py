@@ -41,7 +41,7 @@ class BasketballEnvironment():
         }
 
     def start(self):
-        self.time = np.random.randint(1, 24)
+        self.time = 24 #np.random.randint(1, 24)
         self.initialize_offensive_players()
         self.initialize_defensive_players()
         self.initialize_managers()
@@ -118,8 +118,6 @@ class BasketballEnvironment():
             return
         df = read_func(self.path + csv_name).dropna(how='any')
         for i in df['name']:
-            #self.player_region[df[df['name'] == i]['position'].iloc[0]].geometry.plot()
-            #plt.show()
             players_list.append(
                 PlayerClass(
                     df,
@@ -128,8 +126,6 @@ class BasketballEnvironment():
                     name_column='name'
                 )
             )
-#        for i in players_list:
-#            i.position = self.PLAYER_STARTING_POSITIONS[i.data['position'].iloc[0]]
 
     def initialize_offensive_players(self):
         self.initialize_players('AttackPlayer.csv', self.attack_players, AttackPlayer)

@@ -118,7 +118,7 @@ num_episodes = 3000
 
 episode_rewards = []
 
-epochs = 100
+epochs = 200
 
 for i in tqdm(range(epochs)):
     EPS = 0.9
@@ -128,15 +128,10 @@ for i in tqdm(range(epochs)):
         state = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
         avg_r = []
         episode_going = env.is_in_play
+        print(f'--------------------------------------------------------------- Starting Exploration with epsilon {eps} ------------------------------------------------------------')
         while episode_going:
             action = select_action(state, eps)
-            if i_episode < num_episodes - 20:
-                with HiddenPrints():
-                    observed_reward = env.step(Action(int(action[0][0])))
-            else:
-                print(episode_going)
-                print(f'------------------------------------------------------ Starting new episode With Exploration {eps} ------------------------------------------------------')
-                observed_reward = env.step(Action(int(action[0][0])))
+            observed_reward = env.step(Action(int(action[0][0])))
             reward = torch.tensor([observed_reward])
             avg_r.append(observed_reward)
             observation = env.get_state()
@@ -165,3 +160,4 @@ plt.show()
 
 plt.plot(range(len(LOSS)), LOSS)
 plt.show()
+
