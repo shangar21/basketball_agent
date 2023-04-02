@@ -114,50 +114,51 @@ def optimize_model():
     torch.save(policy_net.state_dict(), './policy_net.pth')
     torch.save(target_net.state_dict(), './target_net.pth')
 
-num_episodes = 3000
+if __name__ == "__main__":
+    num_episodes = 3000
 
-episode_rewards = []
+    episode_rewards = []
 
-epochs = 200
+    epochs = 200
 
-for i in tqdm(range(epochs)):
-    EPS = 0.9
-    for i_episode in tqdm(range(num_episodes)):
-        eps = EPS - (0.1*(float(i_episode)/375))
-        state = env.start()
-        state = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
-        avg_r = []
-        episode_going = env.is_in_play
-        print(f'--------------------------------------------------------------- Starting Exploration with epsilon {eps} ------------------------------------------------------------')
-        while episode_going:
-            action = select_action(state, eps)
-            observed_reward = env.step(Action(int(action[0][0])))
-            reward = torch.tensor([observed_reward])
-            avg_r.append(observed_reward)
-            observation = env.get_state()
-            done = not env.is_in_play
+    for i in tqdm(range(epochs)):
+        EPS = 0.9
+        for i_episode in tqdm(range(num_episodes)):
+            eps = EPS - (0.1*(float(i_episode)/375))
+            state = env.start()
+            state = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
+            avg_r = []
             episode_going = env.is_in_play
-            if done:
-                next_state = None
-            else:
-                next_state = torch.tensor(observation, dtype=torch.float32).unsqueeze(0)
-            memory.push(state, action, next_state, reward)
-            state = next_state
-            optimize_model()
-            target_net_state_dict = target_net.state_dict()
-            policy_net_state_dict = policy_net.state_dict()
-            for key in policy_net_state_dict:
-                target_net_state_dict[key] = policy_net_state_dict[key] * TAU + target_net_state_dict[key]*(1 - TAU)
-                target_net.load_state_dict(target_net_state_dict)
-        episode_rewards.append(np.mean(avg_r))
+            print(f'--------------------------------------------------------------- Starting Exploration with epsilon {eps} ------------------------------------------------------------')
+            while episode_going:
+                action = select_action(state, eps)
+                observed_reward = env.step(Action(int(action[0][0])))
+                reward = torch.tensor([observed_reward])
+                avg_r.append(observed_reward)
+                observation = env.get_state()
+                done = not env.is_in_play
+                episode_going = env.is_in_play
+                if done:
+                    next_state = None
+                else:
+                    next_state = torch.tensor(observation, dtype=torch.float32).unsqueeze(0)
+                memory.push(state, action, next_state, reward)
+                state = next_state
+                optimize_model()
+                target_net_state_dict = target_net.state_dict()
+                policy_net_state_dict = policy_net.state_dict()
+                for key in policy_net_state_dict:
+                    target_net_state_dict[key] = policy_net_state_dict[key] * TAU + target_net_state_dict[key]*(1 - TAU)
+                    target_net.load_state_dict(target_net_state_dict)
+            episode_rewards.append(np.mean(avg_r))
 
-import json
+    import json
 
-json.dump(episode_rewards, open('episode_rewards.json', 'w+'))
+    json.dump(episode_rewards, open('episode_rewards.json', 'w+'))
 
-plt.plot(range(len(episode_rewards)), episode_rewards)
-plt.show()
+    plt.plot(range(len(episode_rewards)), episode_rewards)
+    plt.show()
 
-plt.plot(range(len(LOSS)), LOSS)
-plt.show()
+    plt.plot(range(len(LOSS)), LOSS)
+    plt.show()
 
