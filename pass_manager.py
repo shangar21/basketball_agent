@@ -19,12 +19,12 @@ class PassManager(manager.Manager):
         print(f"{self.attack_player.data['name'].iloc[0]} passes to {player.data['name'].iloc[0]} in box {p_box}")
         if intercept_attempt is assets.Attempt.SUCCESS:
             print(f"{self.defend_player.data['name'].iloc[0]} intercepts pass!")
-            return -1.5
+            return -0.5
         elif pass_attempt is assets.Attempt.SUCCESS:
             print(f"{self.attack_player.data['name'].iloc[0]} makes pass!")
             return 0
         else:
             print(f"{self.attack_player.data['name'].iloc[0]} missed pass!")
-            return -1.5
+            return -0.5
 
 
