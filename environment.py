@@ -211,6 +211,9 @@ if __name__ == "__main__":
     point_to_region = court.point_to_region(ap.position, env.court)
     reward = env._shoot(env.attack_players[0])
 #    reward = env._pass(assets.Action.PASS_TO_SF)
-    reward = env._dribble(assets.Action.DRIBBLE_FORWARD)
+    print(env.player_with_ball.position)
+    for i in range(100):
+        reward = env._dribble(assets.Action.DRIBBLE_FORWARD)
+        print(env.player_with_ball.position)
     print(env.get_state())
     print(len(env.get_state()))
